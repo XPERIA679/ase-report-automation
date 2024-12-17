@@ -40,9 +40,7 @@ jobs:
           MENTION_SHIARA: ${{ secrets.MENTION_SHIARA }}
 
         run: |
-          chmod +x ./autoget.sh
-          ./autoget.sh
-
+            make gen
       - name: Commit changes
         run: |
           git config --local user.name "GitHub Action"
