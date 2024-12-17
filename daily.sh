@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [[ -f .env ]]; then
-    source .env
-else
-    echo ".env file not found!"
-    exit 1
-fi
+# if [[ -f .env ]]; then
+#     source .env
+# else
+#     echo ".env file not found!"
+#     exit 1
+# fi
 
 JWT_HEADER=$(echo -n '{"alg":"RS256","typ":"JWT"}' | openssl base64 | tr -d '\n=' | tr '/+' '_-')
 

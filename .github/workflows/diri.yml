@@ -1,0 +1,54 @@
+name: Run Auto Diri Report
+
+on:
+  workflow_dispatch:
+#   schedule:
+    # - cron: 0 10 * * 1-4 # run at 6pm weekdays
+    # - cron: 0 9 * * FRI
+
+permissions:
+  contents: write
+
+jobs:
+  run-bash:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Run Auto Diri Report
+        env:
+          CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          WEEKLY_WEBHOOK_URL: ${{ secrets.WEEKLY_WEBHOOK_URL }}
+          DAILY_WEBHOOK_URL: ${{ secrets.DAILY_WEBHOOK_URL }}
+
+          RANGE_ROBIN: ${{ secrets.RANGE_ROBIN }}
+          RANGE_EMMAN: ${{ secrets.RANGE_EMMAN }}
+          RANGE_MIKCO: ${{ secrets.RANGE_MIKCO }}
+          RANGE_SHIARA: ${{ secrets.RANGE_SHIARA }}
+
+          MENTION_ROBIN: ${{ secrets.MENTION_ROBIN }}
+          MENTION_EMMAN: ${{ secrets.MENTION_EMMAN }}
+          MENTION_MIKCO: ${{ secrets.MENTION_MIKCO }}
+          MENTION_SHIARA: ${{ secrets.MENTION_SHIARA }}
+
+        run: |
+          chmod +x ./autoget.sh
+          ./autoget.sh
+
+      - name: Commit changes
+        run: |
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+          git add data.txt
+          git commit -m "Update data.txt with new values" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
