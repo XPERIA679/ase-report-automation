@@ -45,8 +45,8 @@ jobs:
         run: |
           git config --local user.name "GitHub Action"
           git config --local user.email "action@github.com"
-          git add data.txt
-          git commit -m "Update data.txt with new values" || echo "No changes to commit"
+          git add tally.txt
+          git commit -m "Update tally.txt with new values" || echo "No changes to commit"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
