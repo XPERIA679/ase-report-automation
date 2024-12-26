@@ -1,4 +1,4 @@
-mikco - 2
-robin - 1
-emman - 1
 shiara - 0
+emman - 1
+robin - 1
+mikco - 1
