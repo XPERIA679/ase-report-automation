@@ -32,6 +32,7 @@ jobs:
           RANGE_EMMAN: ${{ secrets.RANGE_EMMAN }}
           RANGE_MIKCO: ${{ secrets.RANGE_MIKCO }}
           RANGE_SHIARA: ${{ secrets.RANGE_SHIARA }}
+          RANGE_FRANCIS: ${{ secrets.RANGE_FRANCIS }}
 
           MENTION_ROBIN: ${{ secrets.MENTION_ROBIN }}
           MENTION_EMMAN: ${{ secrets.MENTION_EMMAN }}
