@@ -59,7 +59,7 @@ FINAL_MESSAGE+=$(fetch_range_data "MIKCO" "$RANGE_MIKCO")
 FINAL_MESSAGE+=$(fetch_range_data "SHIARA" "$RANGE_SHIARA")
 FINAL_MESSAGE+=$(fetch_range_data "FRANCIS" "$RANGE_FRANCIS")
 
-TEXT="Summarize the content of $FINAL_MESSAGE. Make sure that the summary is in bullet form and each person has its own summary. Start with the name then newline, then bullet points then newline again for the next person. Dont add any format to the names. Make it few words per report only. Dont over add further details, only important ones."
+TEXT="Summarize the content of $FINAL_MESSAGE. Make sure that the summary is in bullet form and each person has its own summary. Start with the name then newline, then bullet points then newline again for the next person. Dont add any format to the names. Make it few words per report only. Dont over add further details, only important ones. As much as possible, make it 2 bullet forms"
 
 generate_summary() {
   RESPONSE=$(curl -s -H 'Content-Type: application/json' \
