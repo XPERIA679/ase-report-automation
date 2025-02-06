@@ -3,7 +3,7 @@ name: Run Auto Diri Report
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 11 * * 1-5 # run at 7pm weekdays
+    - cron: 20 0 * * 1-5 # run on weekdays at 8:20am
 
 permissions:
   contents: write
@@ -33,6 +33,7 @@ jobs:
           RANGE_MIKCO: ${{ secrets.RANGE_MIKCO }}
           RANGE_FRANCIS: ${{ secrets.RANGE_FRANCIS }}
 
+          RANGE_REPORTER: ${{ secrets.RANGE_REPORTER }}
           MENTION_ROBIN: ${{ secrets.MENTION_ROBIN }}
           MENTION_EMMAN: ${{ secrets.MENTION_EMMAN }}
           MENTION_MIKCO: ${{ secrets.MENTION_MIKCO }}
