@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# if [[ -f .env ]]; then
-#     source .env
-# else
-#     echo ".env file not found!"
-#     exit 1
-# fi
+if [[ -f .env ]]; then
+    source .env
+else
+    echo ".env file not found!"
+    exit 1
+fi
 
 JWT_HEADER=$(echo -n '{"alg":"RS256","typ":"JWT"}' | openssl base64 | tr -d '\n=' | tr '/+' '_-')
 
@@ -30,7 +30,7 @@ ACCESS_TOKEN=$(curl -s --request POST \
 fetch_range_data() {
     local RANGE_NAME=$1
     local RANGE=$2
-    local SUMMARY=""
+    local DATA=""
 
     RESPONSE=$(curl -s --request GET \
         "https://sheets.googleapis.com/v4/spreadsheets/$SHEET_ID/values/$RANGE?access_token=$ACCESS_TOKEN")
@@ -43,20 +43,53 @@ fetch_range_data() {
     VALUES=$(echo "$RESPONSE" | jq -r .values)
 
     if [[ "$VALUES" == "null" || -z "$VALUES" ]]; then
-        SUMMARY="No values found for $RANGE_NAME."
+        DATA="No values found for $RANGE_NAME."
     else
-        SUMMARY=$(echo "$VALUES" | jq -r '.[] | .[]' | sed '/^\s*$/d' | tr '\n' ' ')
+        DATA=$(echo "$VALUES" | jq -r '.[] | .[]' | sed '/^\s*$/d' | tr '\n' ' ')
     fi
     
+    echo "$DATA"
+}
+
+print_summary() {
+    local RANGE_NAME=$1
+    local RANGE=$2
+
+    local SUMMARY=$(fetch_range_data "$RANGE_NAME" "$RANGE")
+
     echo "Summary for $RANGE_NAME:"
     echo "$SUMMARY"
 }
 
+fetch_mention_user() {
+    local REPORTER_NAME=$(fetch_range_data "REPORTER" "$RANGE_REPORTER" | xargs)
+    local MENTION_USER=""
 
-FINAL_MESSAGE+=$(fetch_range_data "ROBIN" "$RANGE_ROBIN")
-FINAL_MESSAGE+=$(fetch_range_data "EMMAN" "$RANGE_EMMAN")
-FINAL_MESSAGE+=$(fetch_range_data "MIKCO" "$RANGE_MIKCO")
-FINAL_MESSAGE+=$(fetch_range_data "FRANCIS" "$RANGE_FRANCIS")
+    case $REPORTER_NAME in
+        "Mikco")
+            MENTION_USER=$MENTION_MIKCO
+            ;;
+        "Robin")
+            MENTION_USER=$MENTION_ROBIN
+            ;;
+        "Emman")
+            MENTION_USER=$MENTION_EMMAN
+            ;;
+        "Francis")
+            MENTION_USER=$MENTION_FRANCIS
+            ;;
+        *)
+            MENTION_USER="Error: REPORTER_NAME is $REPORTER_NAME"
+            ;;
+    esac
+
+    echo "$MENTION_USER"
+}
+
+FINAL_MESSAGE+=$(print_summary "ROBIN" "$RANGE_ROBIN")
+FINAL_MESSAGE+=$(print_summary "EMMAN" "$RANGE_EMMAN")
+FINAL_MESSAGE+=$(print_summary "MIKCO" "$RANGE_MIKCO")
+FINAL_MESSAGE+=$(print_summary "FRANCIS" "$RANGE_FRANCIS")
 
 TEXT="Summarize the content of $FINAL_MESSAGE. Make sure that the summary is in bullet form and each person has its own summary. Start with the name then newline, then bullet points then newline again for the next person. Dont add any format to the names. Make it few words per report only. Dont over add further details, only important ones. As much as possible, make it 2 bullet forms"
 
@@ -67,9 +100,13 @@ generate_summary() {
   echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text'
 }
 
+CHATWORK_REMINDER="Good morning! Don't forget to message in Chatwork~"
 SUMMARY=$(generate_summary)
+MENTION_USER=$(fetch_mention_user)
+CC="Reporter: $MENTION_USER"
+REPORT=$(echo -e "$CHATWORK_REMINDER\n\n$SUMMARY\n\n$CC")
 
-JSON_PAYLOAD=$(jq -n --arg text "$SUMMARY" '{text: $text}')
+JSON_PAYLOAD=$(jq -n --arg text "$REPORT" '{text: $text}')
 echo "$JSON_PAYLOAD"
 RESPONSE=$(curl -s -X POST "$DAILY_WEBHOOK_URL" \
     -H "Content-Type: application/json" \
