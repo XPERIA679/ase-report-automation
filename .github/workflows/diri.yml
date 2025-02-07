@@ -3,7 +3,7 @@ name: Run Auto Diri Report
 on:
   workflow_dispatch:
   schedule:
-    - cron: 20 0 * * 1-5 # run on weekdays at 8:20am
+    - cron: 0 0 * * 1-5 # run on weekdays at 8:20am
 
 permissions:
   contents: write
