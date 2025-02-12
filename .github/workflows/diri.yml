@@ -38,6 +38,7 @@ jobs:
           MENTION_EMMAN: ${{ secrets.MENTION_EMMAN }}
           MENTION_MIKCO: ${{ secrets.MENTION_MIKCO }}
           MENTION_SHIARA: ${{ secrets.MENTION_SHIARA }}
+          MENTION_FRANCIS: ${{ secrets.MENTION_FRANCIS }}
 
         run: |
             make gen
