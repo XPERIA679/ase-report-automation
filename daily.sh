@@ -97,11 +97,26 @@ generate_summary() {
   RESPONSE=$(curl -s -H 'Content-Type: application/json' \
     -d '{"contents":[{"parts":[{"text":"'"$TEXT"'"}]}]}' \
     -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=$GEMINI_API_KEY")
-  echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text'
+
+  # Detect error in response
+  ERROR_MSG=$(echo "$RESPONSE" | jq -r '.error.message // empty')
+  if [[ -n "$ERROR_MSG" ]]; then
+    echo "Gemini API Error: $ERROR_MSG"
+    return 1
+  fi
+
+  # Try to extract summary
+  SUMMARY=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text // empty')
+  if [[ -z "$SUMMARY" ]]; then
+    echo "Gemini API returned no summary. Full response: $RESPONSE"
+    return 1
+  fi
+
+  echo "$SUMMARY"
 }
 
 CHATWORK_REMINDER="Good morning! Don't forget to message in Chatwork~"
-SUMMARY=$(generate_summary)
+SUMMARY=$(generate_summary) || SUMMARY="$SUMMARY"
 MENTION_USER=$(fetch_mention_user)
 CC="Reporter: $MENTION_USER"
 REPORT=$(echo -e "$CHATWORK_REMINDER\n\n$SUMMARY\n\n$CC")
