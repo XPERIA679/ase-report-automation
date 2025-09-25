@@ -96,7 +96,7 @@ TEXT="Summarize the content of $FINAL_MESSAGE. Make sure that the summary is in 
 generate_summary() {
   RESPONSE=$(curl -s -H 'Content-Type: application/json' \
     -d '{"contents":[{"parts":[{"text":"'"$TEXT"'"}]}]}' \
-    -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=$GEMINI_API_KEY")
+    -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$GEMINI_API_KEY")
 
   # Detect error in response
   ERROR_MSG=$(echo "$RESPONSE" | jq -r '.error.message // empty')
